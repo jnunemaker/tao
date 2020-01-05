@@ -13,7 +13,7 @@ class TaoClientTest < Minitest::Test
     object = client.object.create("user").value!
     assert_instance_of Tao::Object, object
     assert_equal "user", object.type
-    assert_instance_of Fixnum, object.id
+    assert object.id > 0, "#{object.id} expected to be greater than 0, but was not"
     assert_equal 1, objects_count
 
     read_object = client.object.get(object.id).value!
