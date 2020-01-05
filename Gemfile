@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 
 gem "github-ds", "~> 0.1"
-gem "mysql2", "~> 0.4.5"
+gem "pg", "~> 1.2"
 gem "activerecord", "~> 5.1"
 gem "bundler", "~> 1.14"
 gem "rake", "~> 10.0"
