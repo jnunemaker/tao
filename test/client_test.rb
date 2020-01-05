@@ -96,6 +96,7 @@ class TaoClientTest < Minitest::Test
     end
 
     assert_equal 100, client.association.count(user.id, "friend").value!
+    assert_equal 0, client.association.count(friends.first.id, "friend").value!
 
     friend_ids = friends[11..20].map(&:id)
     associations = client.association.get(user.id, "friend", friend_ids).value!
@@ -168,6 +169,18 @@ class TaoClientTest < Minitest::Test
     # david likes cathy's comment
     client.association.create(comment.id, "liked_by", david.id).value!
     client.association.create(david.id, "likes", comment.id).value!
+
+    # count 'em up
+    assert_equal 7, objects_count
+    assert_equal 16, associations_count
+
+    # get alice's friends
+    friends = client.association.range(alice.id, "friend").value!
+    assert_equal 3, friends.size
+    assert_equal [cathy.id, david.id, bob.id].sort, friends.map(&:id2).sort
+
+    # bob's friend
+    assert_equal [alice.id], client.association.range(bob.id, "friend").value!.map(&:id2)
   end
 
   def objects_count
