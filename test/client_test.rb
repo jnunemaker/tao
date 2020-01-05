@@ -92,7 +92,7 @@ class TaoClientTest < Minitest::Test
       friend = client.object.create("user").value!
       friends << friend
       time = now - (n * day)
-      client.association.create(user.id, "friend", friend.id, time)
+      client.association.create(user.id, "friend", friend.id, time).value!
     end
 
     assert_equal 100, client.association.count(user.id, "friend").value!
