@@ -4,8 +4,8 @@ FRIEND = "FRIEND"
 
 class TaoClientTest < Minitest::Test
   def setup
-    ActiveRecord::Base.connection.execute("TRUNCATE TABLE `tao_objects`")
-    ActiveRecord::Base.connection.execute("TRUNCATE TABLE `tao_associations`")
+    ActiveRecord::Base.connection.execute("TRUNCATE TABLE tao_objects")
+    ActiveRecord::Base.connection.execute("TRUNCATE TABLE tao_associations")
   end
 
   def test_can_create_read_update_and_delete_objects
@@ -13,7 +13,7 @@ class TaoClientTest < Minitest::Test
     object = client.object.create("user").value!
     assert_instance_of Tao::Object, object
     assert_equal "user", object.type
-    assert_instance_of Fixnum, object.id
+    assert object.id > 0, "#{object.id} expected to be greater than 0, but was not"
     assert_equal 1, objects_count
 
     read_object = client.object.get(object.id).value!
@@ -92,7 +92,7 @@ class TaoClientTest < Minitest::Test
       friend = client.object.create("user").value!
       friends << friend
       time = now - (n * day)
-      client.association.create(user.id, "friend", friend.id, time)
+      client.association.create(user.id, "friend", friend.id, time).value!
     end
 
     assert_equal 100, client.association.count(user.id, "friend").value!

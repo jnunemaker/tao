@@ -42,7 +42,7 @@ module Tao
       @id1 = id1
       @type = type
       @id2 = id2
-      @time = time
+      @time = time.utc
       @data = data
     end
   end
@@ -54,7 +54,11 @@ module Tao
 
     def get(id)
       GitHub::Result.new do
-        sql = GitHub::SQL.run <<-SQL, id: id
+        binds = {
+          id: id,
+          force_timezone: :utc,
+        }
+        sql = GitHub::SQL.run <<-SQL, binds
           SELECT type, id, value FROM tao_objects WHERE id = :id LIMIT 1
         SQL
 
@@ -72,7 +76,8 @@ module Tao
       GitHub::Result.new do
         binds = {
           type: type,
-          value: @serializer.dump(data)
+          value: @serializer.dump(data),
+          force_timezone: :utc,
         }
         sql = GitHub::SQL.run <<-SQL, binds
           INSERT INTO tao_objects (type, value) VALUES (:type, :value)
@@ -83,7 +88,11 @@ module Tao
 
     def update(id, data = {})
       GitHub::Result.new do
-        sql = GitHub::SQL.run <<-SQL, id: id
+        binds = {
+          id: id,
+          force_timezone: :utc,
+        }
+        sql = GitHub::SQL.run <<-SQL, binds
           SELECT type, value FROM tao_objects WHERE id = :id LIMIT 1
         SQL
         type = nil
@@ -98,9 +107,10 @@ module Tao
         binds = {
           id: id,
           value: value,
+          force_timezone: :utc,
         }
         sql = GitHub::SQL.run <<-SQL, binds
-          UPDATE tao_objects SET value = :value WHERE id = :id LIMIT 1
+          UPDATE tao_objects SET value = :value WHERE id = :id
         SQL
 
         new_data = @serializer.load(value)
@@ -112,9 +122,10 @@ module Tao
       GitHub::Result.new do
         binds = {
           id: id,
+          force_timezone: :utc,
         }
         sql = GitHub::SQL.run <<-SQL, binds
-          DELETE FROM tao_objects WHERE id = :id LIMIT 1
+          DELETE FROM tao_objects WHERE id = :id
         SQL
         sql.affected_rows > 0
       end
@@ -134,6 +145,7 @@ module Tao
           id1: id1,
           type: type,
           id2_set: id2_set,
+          force_timezone: :utc,
         }
         sql = GitHub::SQL.new <<-SQL, binds
           SELECT id1, type, id2, created_at, value FROM tao_associations
@@ -141,17 +153,16 @@ module Tao
         SQL
 
         if high
-          sql.add "AND created_at <= :high", high: high
+          sql.add "AND created_at <= :high", high: high.utc
         end
 
         if low
-          sql.add "AND created_at >= :low", low: low
+          sql.add "AND created_at >= :low", low: low.utc
         end
 
         sql.results.map do |row|
           id1, type, id2, created_at, value = row
-          data = @serializer.load(value)
-          Association.new(id1, type, id2, created_at, data)
+          Association.new(id1, type, id2, Time.parse(created_at + " UTC"), value)
         end
       end
     end
@@ -163,17 +174,18 @@ module Tao
           type: type,
           offset: offset,
           limit: limit,
+          force_timezone: :utc,
         }
         sql = GitHub::SQL.new <<-SQL, binds
           SELECT id1, type, id2, created_at, value FROM tao_associations
           WHERE id1 = :id1 AND type = :type
           ORDER BY created_at DESC
-          LIMIT :offset, :limit
+          LIMIT :limit
+          OFFSET :offset
         SQL
         sql.results.map do |row|
           id1, type, id2, created_at, value = row
-          data = @serializer.load(value)
-          Association.new(id1, type, id2, created_at, data)
+          Association.new(id1, type, id2, Time.parse(created_at + " UTC"), value)
         end
       end
     end
@@ -183,9 +195,10 @@ module Tao
         binds = {
           id1: id1,
           type: type,
-          high: high,
-          low: low,
+          high: high.utc,
+          low: low.utc,
           limit: limit,
+          force_timezone: :utc,
         }
         sql = GitHub::SQL.new <<-SQL, binds
           SELECT id1, type, id2, created_at, value FROM tao_associations
@@ -200,8 +213,7 @@ module Tao
         SQL
         sql.results.map do |row|
           id1, type, id2, created_at, value = row
-          data = @serializer.load(value)
-          Association.new(id1, type, id2, created_at, data)
+          Association.new(id1, type, id2, Time.parse(created_at + " UTC"), value)
         end
       end
     end
@@ -211,6 +223,7 @@ module Tao
         binds = {
           id1: id1,
           type: type,
+          force_timezone: :utc,
         }
         GitHub::SQL.value <<-SQL, binds
           SELECT count(*) FROM tao_associations
@@ -227,12 +240,13 @@ module Tao
           id2: id2,
           created_at: time.utc,
           value: @serializer.dump(data),
+          force_timezone: :utc,
         }
         sql = GitHub::SQL.run <<-SQL, binds
           INSERT INTO tao_associations (id1, type, id2, created_at, value)
           VALUES (:id1, :type, :id2, :created_at, :value)
         SQL
-        Association.new(id1, type, id2, time, data)
+        Association.new(id1, type, id2, time.utc, data)
       end
     end
 
@@ -242,11 +256,11 @@ module Tao
           id1: id1,
           type: type,
           id2: id2,
+          force_timezone: :utc,
         }
         sql = GitHub::SQL.run <<-SQL, binds
           DELETE FROM tao_associations
           WHERE id1 = :id1 AND type = :type AND id2 = :id2
-          LIMIT 1
         SQL
         sql.affected_rows > 0
       end
@@ -259,12 +273,12 @@ module Tao
           type: type,
           id2: id2,
           new_type: new_type,
+          force_timezone: :utc,
         }
         sql = GitHub::SQL.run <<-SQL, binds
           UPDATE tao_associations
           SET type = :new_type
           WHERE id1 = :id1 AND type = :type AND id2 = :id2
-          LIMIT 1
         SQL
         sql.affected_rows > 0
       end
