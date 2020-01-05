@@ -18,9 +18,9 @@ ActiveRecord::Base.connection.execute(<<-SQL)
 SQL
 ActiveRecord::Base.connection.execute(<<-SQL)
   CREATE TABLE tao_associations (
-    id1 BIGSERIAL NOT NULL,
+    id1 BIGINT NOT NULL,
     type CHARACTER VARYING(255) NOT NULL,
-    id2 BIGSERIAL NOT NULL,
+    id2 BIGINT NOT NULL,
     created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     value JSONB NOT NULL DEFAULT '{}'::jsonb,
     PRIMARY KEY (id1, type, id2)
