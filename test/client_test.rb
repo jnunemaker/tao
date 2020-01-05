@@ -4,8 +4,8 @@ FRIEND = "FRIEND"
 
 class TaoClientTest < Minitest::Test
   def setup
-    ActiveRecord::Base.connection.execute("TRUNCATE TABLE `tao_objects`")
-    ActiveRecord::Base.connection.execute("TRUNCATE TABLE `tao_associations`")
+    ActiveRecord::Base.connection.execute("TRUNCATE TABLE tao_objects")
+    ActiveRecord::Base.connection.execute("TRUNCATE TABLE tao_associations")
   end
 
   def test_can_create_read_update_and_delete_objects
