@@ -50,7 +50,7 @@ module Tao
               limit: limit,
               force_timezone: :utc,
             }
-            sql = GitHub::SQL.new <<-SQL, binds
+            sql = GitHub::SQL.run <<-SQL, binds
               SELECT id1, type, id2, created_at, value FROM tao_associations
               WHERE id1 = :id1 AND type = :type
               ORDER BY created_at DESC
@@ -74,7 +74,7 @@ module Tao
               limit: limit,
               force_timezone: :utc,
             }
-            sql = GitHub::SQL.new <<-SQL, binds
+            sql = GitHub::SQL.run <<-SQL, binds
               SELECT id1, type, id2, created_at, value FROM tao_associations
               WHERE
                 id1 = :id1 AND
@@ -106,7 +106,7 @@ module Tao
           end
         end
 
-        def create(id1, type, id2, time = Time.now.utc, data = {})
+        def create(id1, type, id2, time: Time.now.utc, data: {})
           GitHub::Result.new do
             binds = {
               id1: id1,
