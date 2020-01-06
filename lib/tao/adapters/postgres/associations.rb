@@ -35,7 +35,7 @@ module Tao
 
             sql.results.map do |row|
               id1, type, id2, created_at, value = row
-              Tao::Association.new(id1, type, id2, Time.parse(created_at + " UTC"), value)
+              Association.new(id1, type, id2, Time.parse(created_at + " UTC"), value)
             end
           end
         end
@@ -58,7 +58,7 @@ module Tao
             SQL
             sql.results.map do |row|
               id1, type, id2, created_at, value = row
-              Tao::Association.new(id1, type, id2, Time.parse(created_at + " UTC"), value)
+              Association.new(id1, type, id2, Time.parse(created_at + " UTC"), value)
             end
           end
         end
@@ -86,7 +86,7 @@ module Tao
             SQL
             sql.results.map do |row|
               id1, type, id2, created_at, value = row
-              Tao::Association.new(id1, type, id2, Time.parse(created_at + " UTC"), value)
+              Association.new(id1, type, id2, Time.parse(created_at + " UTC"), value)
             end
           end
         end
@@ -119,7 +119,7 @@ module Tao
               INSERT INTO tao_associations (id1, type, id2, created_at, value)
               VALUES (:id1, :type, :id2, :created_at, :value)
             SQL
-            Tao::Association.new(id1, type, id2, time.utc, data)
+            Association.new(id1, type, id2, time.utc, data)
           end
         end
 

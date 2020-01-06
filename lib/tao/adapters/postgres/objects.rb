@@ -23,7 +23,7 @@ module Tao
             if row = sql.results[0]
               type, id, value = row
               data = @serializer.load(value)
-              Tao::Object.new(type, id, data)
+              Object.new(type, id, data)
             else
               nil
             end
@@ -40,7 +40,7 @@ module Tao
             sql = GitHub::SQL.run <<-SQL, binds
               INSERT INTO tao_objects (type, value) VALUES (:type, :value)
             SQL
-            Tao::Object.new(type, sql.last_insert_id)
+            Object.new(type, sql.last_insert_id)
           end
         end
 
@@ -72,7 +72,7 @@ module Tao
             SQL
 
             new_data = @serializer.load(value)
-            Tao::Object.new(type, id, new_data)
+            Object.new(type, id, new_data)
           end
         end
 
