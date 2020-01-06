@@ -7,7 +7,7 @@ module Tao
     attr_reader :object
     attr_reader :association
 
-    def initialize(serializer: Serializers::JSON)
+    def initialize(serializer: Serializers::Json)
       @object = ObjectStore.new(serializer: serializer)
       @association = AssociationStore.new(serializer: serializer)
     end

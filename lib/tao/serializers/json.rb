@@ -2,7 +2,7 @@ require "json"
 
 module Tao
   module Serializers
-    class JSON
+    class Json
       def self.dump(data)
         ::JSON.generate(data)
       end
