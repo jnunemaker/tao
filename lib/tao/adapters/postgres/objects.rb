@@ -41,7 +41,7 @@ module Tao
             sql = GitHub::SQL.run <<-SQL, binds
               INSERT INTO tao_objects (type, value) VALUES (:type, :value)
             SQL
-            Object.new(type, sql.last_insert_id)
+            Object.new(type, sql.last_insert_id, @serializer.load(binds.fetch(:value)))
           end
         end
 
