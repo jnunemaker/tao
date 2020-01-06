@@ -48,14 +48,10 @@ brandon = client.objects.create("user").value!
 matt = client.objects.create("user").value!
 
 # make some friends
-client.associations.create(john.id, "friend", steve.id).value!
-client.associations.create(steve.id, "friend", john.id).value!
-client.associations.create(john.id, "friend", hoyt.id).value!
-client.associations.create(hoyt.id, "friend", john.id).value!
-client.associations.create(john.id, "friend", brandon.id).value!
-client.associations.create(brandon.id, "friend", john.id).value!
-client.associations.create(john.id, "friend", matt.id).value!
-client.associations.create(matt.id, "friend", john.id).value!
+[steve, hoyt, brandon, matt].each do |user|
+  client.associations.create(john.id, "friend", user.id).value!
+  client.associations.create(user.id, "friend", john.id).value!
+end
 
 # count some friends
 p client.associations.count(john.id, "friend").value!  # => 4
