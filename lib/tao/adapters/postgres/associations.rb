@@ -26,13 +26,8 @@ module Tao
               WHERE id1 = :id1 AND type = :type AND id2 IN :id2_set
             SQL
 
-            if high
-              sql.add "AND created_at <= :high", high: high.utc
-            end
-
-            if low
-              sql.add "AND created_at >= :low", low: low.utc
-            end
+            sql.add "AND created_at <= :high", high: high.utc if high
+            sql.add "AND created_at >= :low", low: low.utc if low
 
             sql.results.map do |row|
               id1, type, id2, created_at, value = row
