@@ -1,6 +1,5 @@
 require "tao/serializers/json"
-require "tao/object_store"
-require "tao/association_store"
+require "tao/adapters/postgres"
 
 module Tao
   class Client
@@ -8,8 +7,8 @@ module Tao
     attr_reader :association
 
     def initialize(serializer: Serializers::Json)
-      @object = ObjectStore.new(serializer: serializer)
-      @association = AssociationStore.new(serializer: serializer)
+      @object = Adapters::Postgres::Object.new(serializer: serializer)
+      @association = Adapters::Postgres::Association.new(serializer: serializer)
     end
   end
 end
