@@ -6,7 +6,7 @@ Nothing to see here. Just playing around.
 
 ### The Tables
 
-```
+```ruby
 ActiveRecord::Base.establish_connection({
   adapter: "postgresql",
   database: "tao_test",
@@ -38,7 +38,7 @@ SQL
 
 ### The Code
 
-```
+```ruby
 require 'tao'
 client = Tao::Client.new
 john = client.object.create("user").value!
