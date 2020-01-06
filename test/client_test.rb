@@ -154,6 +154,7 @@ class TaoClientTest < Minitest::Test
 
     # create location
     location = client.object.create("location", name: "Golden Gate Bridge").value!
+    assert_equal "Golden Gate Bridge", client.object.get(location.id).value!.data.fetch("name")
     client.association.create(checkin.id, "location", location.id).value!
     client.association.create(location.id, "checkin", checkin.id).value!
 
