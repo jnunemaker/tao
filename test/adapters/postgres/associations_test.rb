@@ -1,4 +1,5 @@
 require 'test_helper'
+require "tao/adapters/postgres/associations"
 
 class AssociationPostgresAdapterTest < Minitest::Test
   def setup

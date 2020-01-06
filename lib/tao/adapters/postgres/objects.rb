@@ -1,12 +1,13 @@
 require "github/sql"
 require "github/result"
 require "tao/object"
+require "tao/serializers/json"
 
 module Tao
   module Adapters
     module Postgres
       class Objects
-        def initialize(serializer:)
+        def initialize(serializer: Tao::Serializers::Json)
           @serializer = serializer
         end
 

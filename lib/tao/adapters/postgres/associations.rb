@@ -1,6 +1,7 @@
 require "github/sql"
 require "github/result"
 require "tao/association"
+require "tao/serializers/json"
 
 module Tao
   module Adapters
@@ -8,7 +9,7 @@ module Tao
       class Associations
         DEFAULT_LIMIT = 6_000
 
-        def initialize(serializer:)
+        def initialize(serializer: Tao::Serializers::Json)
           @serializer = serializer
         end
 

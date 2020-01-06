@@ -1,4 +1,5 @@
 require 'test_helper'
+require "tao/adapters/postgres/objects"
 
 class ObjectPostgresAdapterTest < Minitest::Test
   def setup
