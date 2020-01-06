@@ -1,20 +1,8 @@
 require "tao/version"
 require "github-ds"
+require "tao/serializers/json"
 
 module Tao
-  module Serializers
-    require "json"
-    class JSON
-      def self.dump(data)
-        ::JSON.generate(data)
-      end
-
-      def self.load(value)
-        ::JSON.parse(value)
-      end
-    end
-  end
-
   class Client
     attr_reader :object
     attr_reader :association
