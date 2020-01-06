@@ -41,11 +41,11 @@ SQL
 ```ruby
 require 'tao'
 client = Tao::Client.new
-john = client.objects.create("user").value!
-steve = client.objects.create("user").value!
-hoyt = client.objects.create("user").value!
-brandon = client.objects.create("user").value!
-matt = client.objects.create("user").value!
+john = client.objects.create("user", "name" => "John").value!
+steve = client.objects.create("user", "name" => "Steve").value!
+hoyt = client.objects.create("user", "name" => "Hoyt").value!
+brandon = client.objects.create("user", "name" => "Brandon").value!
+matt = client.objects.create("user", "name" => "Matt").value!
 
 # make some friends
 [steve, hoyt, brandon, matt].each do |user|
