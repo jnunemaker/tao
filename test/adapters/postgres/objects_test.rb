@@ -9,6 +9,24 @@ class ObjectPostgresAdapterTest < Minitest::Test
     @objects = Tao::Adapters::Postgres::Objects.new
   end
 
+  def test_get
+    data = {
+      "name" => "John Nunemaker",
+      "username" => "jnunemaker",
+    }
+    object = objects.create("user", data).value!
+    read_object = objects.get(object.id).value!
+    assert_instance_of Tao::Object, object
+    assert_equal "user", object.type
+    assert_equal object.id, read_object.id
+    assert_equal "John Nunemaker", object.data.fetch("name")
+    assert_equal "jnunemaker", object.data.fetch("username")
+  end
+
+  def test_get_does_not_exist_in_database
+    assert_nil objects.get(99).value!
+  end
+
   def test_create
     object = objects.create("user").value!
     assert_instance_of Tao::Object, object
@@ -30,22 +48,37 @@ class ObjectPostgresAdapterTest < Minitest::Test
     assert_equal "jnunemaker", object.data.fetch("username")
   end
 
-  def test_get
+  def test_update
     data = {
       "name" => "John Nunemaker",
       "username" => "jnunemaker",
     }
     object = objects.create("user", data).value!
-    read_object = objects.get(object.id).value!
-    assert_instance_of Tao::Object, object
-    assert_equal "user", object.type
-    assert_equal object.id, read_object.id
-    assert_equal "John Nunemaker", object.data.fetch("name")
-    assert_equal "jnunemaker", object.data.fetch("username")
+
+    assert objects.update(object.id, "name" => "Foo").value!
+    assert_equal 1, objects_count
+
+    updated_object = objects.get(object.id).value!
+    assert_equal object.id, updated_object.id
+    assert_equal "user", updated_object.type
+    assert_equal "Foo", updated_object.data.fetch("name")
+
+    # update rewrites entire value so provide whatever you need
+    assert !updated_object.data.key?("username")
   end
 
-  def test_get_does_not_exist_in_database
-    assert_nil objects.get(99).value!
+  def test_update_does_not_exist_in_database
+    assert !objects.update(1, "name" => "Nope").value!
+  end
+
+  def test_delete
+    object = objects.create("user").value!
+    assert objects.delete(object.id).value!
+    assert_equal 0, objects_count
+  end
+
+  def test_delete_does_not_exist_in_database
+    assert !objects.delete(1).value!
   end
 
   def test_can_create_read_update_and_delete_objects
@@ -61,8 +94,9 @@ class ObjectPostgresAdapterTest < Minitest::Test
     assert_equal "user", read_object.type
     assert_equal object.id, read_object.id
 
-    updated_object = objects.update(object.id, foo: "bar").value!
-    assert_instance_of Tao::Object, object
+    assert objects.update(object.id, foo: "bar").value!
+    updated_object = objects.get(object.id).value!
+    assert_instance_of Tao::Object, updated_object
     assert_equal "user", updated_object.type
     assert_equal object.id, updated_object.id
     assert_equal "bar", updated_object.data["foo"]

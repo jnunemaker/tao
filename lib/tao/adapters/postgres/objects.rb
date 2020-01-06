@@ -49,41 +49,20 @@ module Tao
           GitHub::Result.new do
             binds = {
               id: id,
-              force_timezone: :utc,
-            }
-            sql = GitHub::SQL.run <<-SQL, binds
-              SELECT type, value FROM tao_objects WHERE id = :id LIMIT 1
-            SQL
-            type = nil
-            existing_data = if (row = sql.results[0])
-              type, value = row
-              @serializer.load(value)
-            else
-              {}
-            end
-
-            value = @serializer.dump(existing_data.merge(data))
-            binds = {
-              id: id,
-              value: value,
+              value: @serializer.dump(data),
               force_timezone: :utc,
             }
             sql = GitHub::SQL.run <<-SQL, binds
               UPDATE tao_objects SET value = :value WHERE id = :id
             SQL
 
-            new_data = @serializer.load(value)
-            Object.new(type, id, new_data)
+            sql.affected_rows > 0
           end
         end
 
         def delete(id)
           GitHub::Result.new do
-            binds = {
-              id: id,
-              force_timezone: :utc,
-            }
-            sql = GitHub::SQL.run <<-SQL, binds
+            sql = GitHub::SQL.run <<-SQL, id: id
               DELETE FROM tao_objects WHERE id = :id
             SQL
             sql.affected_rows > 0
