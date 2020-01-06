@@ -10,47 +10,47 @@ class PostgresAdapterTest < Minitest::Test
     client = Tao::Client.new
 
     # create users
-    bob = client.object.create("user", name: "Bob").value!
-    alice = client.object.create("user", name: "Alice").value!
-    david = client.object.create("user", name: "David").value!
-    cathy = client.object.create("user", name: "Cathy").value!
+    bob = client.objects.create("user", name: "Bob").value!
+    alice = client.objects.create("user", name: "Alice").value!
+    david = client.objects.create("user", name: "David").value!
+    cathy = client.objects.create("user", name: "Cathy").value!
 
     # create friendships
     [bob, david, cathy].each do |user|
-      client.association.create(alice.id, "friend", user.id).value!
-      client.association.create(user.id, "friend", alice.id).value!
+      client.associations.create(alice.id, "friend", user.id).value!
+      client.associations.create(user.id, "friend", alice.id).value!
     end
 
     # create checkin
-    checkin = client.object.create("checkin").value!
-    client.association.create(alice.id, "authored", checkin.id).value!
-    client.association.create(checkin.id, "authored_by", alice.id).value!
+    checkin = client.objects.create("checkin").value!
+    client.associations.create(alice.id, "authored", checkin.id).value!
+    client.associations.create(checkin.id, "authored_by", alice.id).value!
 
     # create location
-    location = client.object.create("location", name: "Golden Gate Bridge").value!
-    assert_equal "Golden Gate Bridge", client.object.get(location.id).value!.data.fetch("name")
-    client.association.create(checkin.id, "location", location.id).value!
-    client.association.create(location.id, "checkin", checkin.id).value!
+    location = client.objects.create("location", name: "Golden Gate Bridge").value!
+    assert_equal "Golden Gate Bridge", client.objects.get(location.id).value!.data.fetch("name")
+    client.associations.create(checkin.id, "location", location.id).value!
+    client.associations.create(location.id, "checkin", checkin.id).value!
 
     # tag bob at checkin
-    client.association.create(checkin.id, "tagged", bob.id).value!
-    client.association.create(bob.id, "tagged_at", checkin.id).value!
+    client.associations.create(checkin.id, "tagged", bob.id).value!
+    client.associations.create(bob.id, "tagged_at", checkin.id).value!
 
     # create comment for cathy on checkin
-    comment = client.object.create("comment", text: "Wish we were there!").value!
-    client.association.create(comment.id, "authored_by", cathy.id).value!
-    client.association.create(cathy.id, "authored", comment.id).value!
+    comment = client.objects.create("comment", text: "Wish we were there!").value!
+    client.associations.create(comment.id, "authored_by", cathy.id).value!
+    client.associations.create(cathy.id, "authored", comment.id).value!
 
     # david likes cathy's comment
-    client.association.create(comment.id, "liked_by", david.id).value!
-    client.association.create(david.id, "likes", comment.id).value!
+    client.associations.create(comment.id, "liked_by", david.id).value!
+    client.associations.create(david.id, "likes", comment.id).value!
 
     # get alice's friends
-    friends = client.association.range(alice.id, "friend").value!
+    friends = client.associations.range(alice.id, "friend").value!
     assert_equal 3, friends.size
     assert_equal [cathy.id, david.id, bob.id].sort, friends.map(&:id2).sort
 
     # bob's friend
-    assert_equal [alice.id], client.association.range(bob.id, "friend").value!.map(&:id2)
+    assert_equal [alice.id], client.associations.range(bob.id, "friend").value!.map(&:id2)
   end
 end

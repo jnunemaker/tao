@@ -5,7 +5,7 @@ require "tao/object"
 module Tao
   module Adapters
     module Postgres
-      class Object
+      class Objects
         def initialize(serializer:)
           @serializer = serializer
         end

@@ -8,12 +8,12 @@ class AssociationPostgresAdapterTest < Minitest::Test
   def test_can_create_get_change_type_and_delete_association
     client = Tao::Client.new
 
-    association = client.association.create(id1, friend_type, id2).value!
+    association = client.associations.create(id1, friend_type, id2).value!
     assert_instance_of Tao::Association, association
     assert_equal 1, associations_count
     now = Time.now.utc
 
-    friend_associations = client.association.get(id1, friend_type, [id2]).value!
+    friend_associations = client.associations.get(id1, friend_type, [id2]).value!
     assert_instance_of Array, friend_associations
     friend_association = friend_associations.first
     assert_instance_of Tao::Association, friend_association
@@ -22,11 +22,11 @@ class AssociationPostgresAdapterTest < Minitest::Test
     assert_equal id2, friend_association.id2
     assert_in_delta now, friend_association.time, 2
 
-    result = client.association.change_type(id1, friend_type, id2, enemy_type).value!
+    result = client.associations.change_type(id1, friend_type, id2, enemy_type).value!
     assert result
     assert_equal 1, associations_count
 
-    enemy_associations = client.association.get(id1, enemy_type, [id2]).value!
+    enemy_associations = client.associations.get(id1, enemy_type, [id2]).value!
     assert_instance_of Array, enemy_associations
     enemy_association = enemy_associations.first
     assert_instance_of Tao::Association, enemy_association
@@ -35,14 +35,14 @@ class AssociationPostgresAdapterTest < Minitest::Test
     assert_equal id2, enemy_association.id2
     assert_in_delta now, enemy_association.time, 2
 
-    assert client.association.delete(id1, enemy_type, id2).value!
+    assert client.associations.delete(id1, enemy_type, id2).value!
   end
 
   def test_can_create_association_with_time_and_data
     client = Tao::Client.new
     time = Time.now.utc - 60
     data = {"foo" => "bar"}
-    association = client.association.create(id1, friend_type, id2, time, data).value!
+    association = client.associations.create(id1, friend_type, id2, time, data).value!
     assert_instance_of Tao::Association, association
     assert_equal 1, associations_count
     assert_equal time, association.time
@@ -59,14 +59,14 @@ class AssociationPostgresAdapterTest < Minitest::Test
       friend_id = n + 100
       friend_ids << friend_id
       time = now - (n * day)
-      client.association.create(id1, friend_type, friend_id, time).value!
+      client.associations.create(id1, friend_type, friend_id, time).value!
     end
 
-    assert_equal 100, client.association.count(id1, friend_type).value!
-    assert_equal 0, client.association.count(friend_ids.first, friend_type).value!
+    assert_equal 100, client.associations.count(id1, friend_type).value!
+    assert_equal 0, client.associations.count(friend_ids.first, friend_type).value!
 
     batch_friend_ids = friend_ids[11..20]
-    associations = client.association.get(id1, friend_type, batch_friend_ids).value!
+    associations = client.associations.get(id1, friend_type, batch_friend_ids).value!
     assert_equal 10, associations.size
     associations.each do |association|
       assert_equal id1, association.id1
@@ -74,22 +74,22 @@ class AssociationPostgresAdapterTest < Minitest::Test
       assert_includes friend_ids, association.id2
     end
 
-    associations = client.association.get(id1, friend_type, friend_ids, high: now - (5 * day)).value!
+    associations = client.associations.get(id1, friend_type, friend_ids, high: now - (5 * day)).value!
     assert_equal 96, associations.size
 
-    associations = client.association.get(id1, friend_type, friend_ids, low: now - (5 * day)).value!
+    associations = client.associations.get(id1, friend_type, friend_ids, low: now - (5 * day)).value!
     assert_equal 5, associations.size
 
-    associations = client.association.range(id1, friend_type, offset: 10).value!
+    associations = client.associations.range(id1, friend_type, offset: 10).value!
     assert_equal 90, associations.size
 
-    associations = client.association.range(id1, friend_type, offset: 10, limit: 10).value!
+    associations = client.associations.range(id1, friend_type, offset: 10, limit: 10).value!
     assert_equal 10, associations.size
     assert_equal friend_ids[10..19], associations.map(&:id2)
 
     high = now - (5 * day)
     low = now - (14 * day)
-    associations = client.association.time_range(id1, friend_type, high: high, low: low).value!
+    associations = client.associations.time_range(id1, friend_type, high: high, low: low).value!
     assert_equal 10, associations.size
     associations.each { |association|
       assert association.time.to_i >= low.to_i, "#{association.time} was not >= #{low}"

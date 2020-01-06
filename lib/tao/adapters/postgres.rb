@@ -1,2 +1,2 @@
-require "tao/adapters/postgres/association"
-require "tao/adapters/postgres/object"
+require "tao/adapters/postgres/associations"
+require "tao/adapters/postgres/objects"

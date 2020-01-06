@@ -5,7 +5,7 @@ require "tao/association"
 module Tao
   module Adapters
     module Postgres
-      class Association
+      class Associations
         DEFAULT_LIMIT = 6_000
 
         def initialize(serializer:)
