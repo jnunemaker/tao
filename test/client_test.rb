@@ -1,7 +1,5 @@
 require 'test_helper'
 
-FRIEND = "FRIEND"
-
 class TaoClientTest < Minitest::Test
   def setup
     ActiveRecord::Base.connection.execute("TRUNCATE TABLE tao_objects")
